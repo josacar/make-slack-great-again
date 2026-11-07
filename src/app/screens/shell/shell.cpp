@@ -3532,6 +3532,7 @@ void Shell::applySettings() {
     f.unreadsOnly                    = _settings.unreadsOnly;
     f.unreadsOnlyAppliesToCustomSections = _settings.unreadsOnlyAppliesToCustomSections;
     f.unreadsOnlyAppliesToStarred    = _settings.unreadsOnlyAppliesToStarred;
+    f.directAndExternalFirst         = _settings.directAndExternalFirst;
     f.highlightMentionsOnly          = _settings.boldMentionsOnly;
     f.defaultLevel                   = defaultLevel();
     _sidebar->setFilters(f);

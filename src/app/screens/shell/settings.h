@@ -67,6 +67,7 @@ struct Settings {
     bool                     showAgentsApps = true, unreadsOnly = false;
     bool                     unreadsOnlyAppliesToCustomSections = true,
                              unreadsOnlyAppliesToStarred = true;
+    bool                     directAndExternalFirst = false;
     bool                     animateEmoji = true, animateMedia = true;
     // The message toolbar's one-click reactions: 0 off, 1 the most used (the
     // emoji picker's Frequently used), 2 quickReactionNames.

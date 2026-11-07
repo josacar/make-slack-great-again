@@ -102,6 +102,7 @@ public:
         bool               showAgentsApps = true, unreadsOnly = false;
         bool               unreadsOnlyAppliesToCustomSections = true,
                            unreadsOnlyAppliesToStarred = true;
+        bool               directAndExternalFirst = false;
         bool               highlightMentionsOnly = true; // "Highlight mentions-only channels…"
         model::NotifyLevel defaultLevel          = model::NotifyLevel::All;
         bool               operator==(const Filters &) const = default;

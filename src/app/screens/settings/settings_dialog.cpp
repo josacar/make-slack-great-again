@@ -655,6 +655,8 @@ void SettingsDialog::buildAppearance() {
         applyStarred->onChange = [this](bool on) {
             _draft.unreadsOnlyAppliesToStarred = on;
         };
+        check(g, tr("Show direct messages and external conversations at the top"),
+              &d.directAndExternalFirst, true);
     }
 
     heading(_content, tr("Visual effects"));

@@ -41,6 +41,7 @@ const struct {
     {"unreadsOnly", &Settings::unreadsOnly},
     {"unreadsOnlyAppliesToCustomSections", &Settings::unreadsOnlyAppliesToCustomSections},
     {"unreadsOnlyAppliesToStarred", &Settings::unreadsOnlyAppliesToStarred},
+    {"directAndExternalFirst", &Settings::directAndExternalFirst},
     {"animateEmoji", &Settings::animateEmoji},
     {"animateMedia", &Settings::animateMedia},
     {"customTrayIcon", &Settings::customTrayIcon},
