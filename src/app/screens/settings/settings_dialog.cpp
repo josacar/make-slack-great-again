@@ -58,6 +58,9 @@ bool shell::Settings::*const kAppearanceBools[] = {
     &shell::Settings::markdownFormatting,
     &shell::Settings::showAgentsApps,
     &shell::Settings::unreadsOnly,
+    &shell::Settings::unreadsOnlyAppliesToCustomSections,
+    &shell::Settings::unreadsOnlyAppliesToStarred,
+    &shell::Settings::directAndExternalFirst,
     &shell::Settings::animateEmoji,
     &shell::Settings::animateMedia,
 };
