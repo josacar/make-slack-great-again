@@ -100,6 +100,8 @@ public:
     struct Filters {
         int                relevantDays   = 14;
         bool               showAgentsApps = true, unreadsOnly = false;
+        bool               unreadsOnlyAppliesToCustomSections = true,
+                           unreadsOnlyAppliesToStarred = true;
         bool               highlightMentionsOnly = true; // "Highlight mentions-only channels…"
         model::NotifyLevel defaultLevel          = model::NotifyLevel::All;
         bool               operator==(const Filters &) const = default;
