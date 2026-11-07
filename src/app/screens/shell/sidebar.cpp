@@ -981,10 +981,9 @@ bool Sidebar::relevant(ConvRef ref) const {
 
 void Sidebar::rebuild() {
     for (auto *h : _sections) { // survives the rebuild
-        if (h->kind == Sidebar::Custom)
-            _collapsedCustom[h->sectionId] = h->collapsed;
-        else
-            _collapsed[h->kind] = h->collapsed;
+        const std::string key = sectionKey(h->kind, h->sectionId);
+        if (!key.empty())
+            setCollapsedState(key, h->collapsed);
     }
     _dragRow = nullptr; // a drag under way ends with its row
     _items->clearChildren();
@@ -1142,7 +1141,8 @@ void Sidebar::rebuild() {
                              const std::vector<ConvRef> &rows,
                              const std::string          &id = {}) {
         auto *h      = _items->add<SectionHeader>(*this, kind, icon, std::move(title));
-        h->collapsed = kind != Custom && _collapsed[kind];
+        const std::string key = sectionKey(kind, id);
+        h->collapsed = !key.empty() && _collapsed.count(key);
         _sections.push_back(h);
         // VIP unreads never collapses: a lift for unreads, not a section to
         // fold away (its header shows the pill, no chevron to say so).
@@ -1150,6 +1150,12 @@ void Sidebar::rebuild() {
             h->onClick = [this, h] {
                 h->collapsed = !h->collapsed;
                 applyCollapse(h);
+                const std::string k = sectionKey(h->kind, h->sectionId);
+                if (!k.empty()) {
+                    setCollapsedState(k, h->collapsed);
+                    if (onCollapsedChanged)
+                        onCollapsedChanged();
+                }
             };
         h->sectionId = id;
         for (size_t i : sortedOrder(sortOf(h), rows)) {
@@ -1175,8 +1181,7 @@ void Sidebar::rebuild() {
             auto *h = section(Custom, Icon::List, secs[i].name, custom[i], secs[i].id);
             if (!secs[i].emoji.empty())
                 h->setEmoji(store.emojiFor(secs[i].emoji));
-            const auto was = _collapsedCustom.find(secs[i].id);
-            h->collapsed   = was != _collapsedCustom.end() && was->second;
+            h->collapsed = _collapsed.count(sectionKey(Custom, secs[i].id)) != 0;
             applyCollapse(h);
         }
     };
@@ -1230,11 +1235,14 @@ void Sidebar::rebuild() {
         // are started with.
         if (!_team.empty()) {
             auto *t      = _items->add<SectionHeader>(*this, Team, Icon::Users, tr("Team"));
-            t->collapsed = _collapsed[Team];
+            t->collapsed = _collapsed.count(sectionKey(Team, {})) != 0;
             _sections.push_back(t);
             t->onClick = [this, t] {
                 t->collapsed = !t->collapsed;
                 applyCollapse(t);
+                setCollapsedState(sectionKey(Team, {}), t->collapsed);
+                if (onCollapsedChanged)
+                    onCollapsedChanged();
             };
             for (const auto &mate : _team) {
                 auto *row = _items->add<TeammateRow>(*this, mate);
@@ -1487,8 +1495,9 @@ std::string Sidebar::sectionKey(Kind kind, const std::string &id) {
     case Vip:
         return "#vip";
     case Team:
+        return "#team";
     case KindCount:
-        break; // the Team header has no key (no sort, no persisted collapse)
+        break;
     }
     return {};
 }
@@ -1518,6 +1527,23 @@ void Sidebar::setSort(const std::string &key, SectionSort sort) {
     rebuildSoon(false); // not from inside the menu's own pick
     if (onSortsChanged)
         onSortsChanged();
+}
+
+void Sidebar::setCollapsed(Collapsed collapsed) {
+    std::erase_if(collapsed, [](const auto &e) { return e.first.empty() || !e.second; });
+    if (collapsed == _collapsed)
+        return;
+    _collapsed = std::move(collapsed);
+    rebuild();
+}
+
+void Sidebar::setCollapsedState(const std::string &key, bool on) {
+    if (key.empty())
+        return;
+    if (on)
+        _collapsed[key] = true;
+    else
+        _collapsed.erase(key);
 }
 
 void Sidebar::sectionMenu(SectionHeader *h, PointF at) {
