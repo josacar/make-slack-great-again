@@ -626,7 +626,8 @@ void SettingsDialog::buildAppearance() {
         caption(
             g,
             tr("The conversation you are reading stays listed until you move on.\n"
-               "Starred conversations are always shown.")
+               "With \"Show only unread conversations\" on, starred conversations\n"
+               "are listed while they still have unread messages.")
         );
         // The activity window has nothing to decide while only unread chats
         // are listed: grey it out so the two don't read as competing.

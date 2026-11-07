@@ -819,9 +819,9 @@ Sidebar::Sidebar(screens::Context &ctx, Avatars &avatars) : _ctx(ctx), _avatars(
             const auto &cv = _ctx.store().conversation(ch.conv);
             ConvRow    *r  = rowFor(ch.conv);
             // Under unreads-only a row comes or goes when its bold state
-            // flips (the selected row and Starred stay regardless).
+            // flips (the selected row stays regardless).
             const bool  filterFlip =
-                _filters.unreadsOnly && ch.conv != _selected && !cv.starred &&
+                _filters.unreadsOnly && ch.conv != _selected &&
                 !(r && r->section->kind == Sidebar::Custom) &&
                 (r ? r->unread != paintsUnread(cv) : cv.member && paintsUnread(cv));
             // Same classify() rebuild() uses, so a row only looks "moved" when it would be.
@@ -1059,7 +1059,8 @@ void Sidebar::rebuild() {
         // rule (unread-only filter, relevance window, ...).
         switch (classify(cv)) {
         case Starred:
-            lists[Starred].push_back(c);
+            if (listed(c))
+                lists[Starred].push_back(c);
             break;
         case Apps:
             if (listed(c) && (_filters.showAgentsApps || c == _selected))

@@ -262,7 +262,7 @@ TEST("sidebar: channels outside the relevant days go under \"N more channels\"")
     CHECK(h.sidebar().hiddenChannels() == 0);
 }
 
-TEST("sidebar: \"Show only unread conversations\" keeps the unread, the open and the starred") {
+TEST("sidebar: \"Show only unread conversations\" keeps the unread, the open, and unread starred") {
     Harness h;
     h.settings.unreadsOnly = true;
     h.sh->applySettings();
@@ -270,7 +270,7 @@ TEST("sidebar: \"Show only unread conversations\" keeps the unread, the open and
     CHECK(h.sidebar().rowState(h.conv("C0ENG")).exists);     // unread
     CHECK(h.sidebar().rowState(h.conv("D0MIRA")).exists);    // unread DM
     CHECK(h.sidebar().rowState(h.conv("C0DESIGN")).exists);  // open (and starred)
-    CHECK(h.sidebar().rowState(h.conv("C0GENERAL")).exists); // starred
+    CHECK_FALSE(h.sidebar().rowState(h.conv("C0GENERAL")).exists); // starred, but read → hidden
     CHECK_FALSE(h.sidebar().rowState(h.conv("C0RANDOM")).exists);
     CHECK_FALSE(h.sidebar().rowState(h.conv("D0JONAS")).exists);
     h.settings.unreadsOnly = false;
