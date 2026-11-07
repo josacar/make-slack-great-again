@@ -1035,7 +1035,8 @@ void Sidebar::rebuild() {
     if (seeded && onVisitedChanged)
         onVisitedChanged();
     // The user's own sections, under Starred: each lists its conversations
-    // in its own order, like Starred regardless of the filters, and takes
+    // in its own order, like Starred regardless of the filters, except
+    // unreads-only which still applies, and takes
     // them out of the other sections (Starred too).
     const bool                        own  = caps.customSections;
     const auto                       &secs = store.sections();
@@ -1047,7 +1048,7 @@ void Sidebar::rebuild() {
             if (c == kNoConv || inCustom[c])
                 continue;
             inCustom[c] = 1;
-            if (store.conversation(c).member && !deadDm(store, store.conversation(c)))
+            if (store.conversation(c).member && !deadDm(store, store.conversation(c)) && listed(c))
                 custom[s].push_back(c);
         }
     for (ConvRef c = 0; c < store.conversationCount(); ++c) {

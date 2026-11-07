@@ -672,14 +672,14 @@ TEST("sections: a dropped row lands in the section; Channels takes it back") {
     CHECK(h.store.conversation(eng).starred);
 }
 
-TEST("sections: under unreads-only a section keeps its read rows") {
+TEST("sections: under unreads-only a section keeps its unread rows") {
     Harness       h;
     const ConvRef random = h.conv("C0RANDOM"); // read
     h.backend.createSection("Projects", "", random);
     h.settings.unreadsOnly = true;
     h.sh->applySettings();
     pump();
-    CHECK(h.sh->sidebar().rowState(random).exists);
+    CHECK_FALSE(h.sh->sidebar().rowState(random).exists);
 }
 
 TEST("sections: the conversation and section header menus") {
