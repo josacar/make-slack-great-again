@@ -822,7 +822,8 @@ Sidebar::Sidebar(screens::Context &ctx, Avatars &avatars) : _ctx(ctx), _avatars(
             // flips (the selected row stays regardless).
             const bool  filterFlip =
                 _filters.unreadsOnly && ch.conv != _selected &&
-                !(r && r->section->kind == Sidebar::Custom) &&
+                !(r && r->section->kind == Sidebar::Custom && !_filters.unreadsOnlyAppliesToCustomSections) &&
+                !(cv.starred && !_filters.unreadsOnlyAppliesToStarred) &&
                 (r ? r->unread != paintsUnread(cv) : cv.member && paintsUnread(cv));
             // Same classify() rebuild() uses, so a row only looks "moved" when it would be.
             const bool reclassified =
@@ -1048,7 +1049,8 @@ void Sidebar::rebuild() {
             if (c == kNoConv || inCustom[c])
                 continue;
             inCustom[c] = 1;
-            if (store.conversation(c).member && !deadDm(store, store.conversation(c)) && listed(c))
+            if (store.conversation(c).member && !deadDm(store, store.conversation(c)) &&
+                (!_filters.unreadsOnly || !_filters.unreadsOnlyAppliesToCustomSections || listed(c)))
                 custom[s].push_back(c);
         }
     for (ConvRef c = 0; c < store.conversationCount(); ++c) {
@@ -1059,7 +1061,7 @@ void Sidebar::rebuild() {
         // rule (unread-only filter, relevance window, ...).
         switch (classify(cv)) {
         case Starred:
-            if (listed(c))
+            if (!_filters.unreadsOnly || !_filters.unreadsOnlyAppliesToStarred || listed(c))
                 lists[Starred].push_back(c);
             break;
         case Apps:

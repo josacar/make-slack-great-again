@@ -39,6 +39,8 @@ const struct {
     {"markdownFormatting", &Settings::markdownFormatting},
     {"showAgentsApps", &Settings::showAgentsApps},
     {"unreadsOnly", &Settings::unreadsOnly},
+    {"unreadsOnlyAppliesToCustomSections", &Settings::unreadsOnlyAppliesToCustomSections},
+    {"unreadsOnlyAppliesToStarred", &Settings::unreadsOnlyAppliesToStarred},
     {"animateEmoji", &Settings::animateEmoji},
     {"animateMedia", &Settings::animateMedia},
     {"customTrayIcon", &Settings::customTrayIcon},
