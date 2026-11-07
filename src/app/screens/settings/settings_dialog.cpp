@@ -637,7 +637,7 @@ void SettingsDialog::buildAppearance() {
                   &d.unreadsOnlyAppliesToStarred, true);
         // The activity window has nothing to decide while only unread chats
         // are listed: grey it out so the two don't read as competing.
-        auto sync = [this](bool unreadsOnly) {
+        auto sync = [this, applyCustom, applyStarred](bool unreadsOnly) {
             _p->days->setEnabled(!unreadsOnly);
             _p->daysLabel->setColor(unreadsOnly ? C::FormTextFaint : C::FormText);
             _p->daysDesc->setColor(unreadsOnly ? C::FormTextFaint : C::FormTextMuted);
