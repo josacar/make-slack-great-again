@@ -808,7 +808,7 @@ Sidebar::Sidebar(screens::Context &ctx, Avatars &avatars) : _ctx(ctx), _avatars(
                 // reads it); else most recent first may move it.
                 const ConvRow *r = rowFor(ch.conv);
                 if (r->section->kind != Sidebar::Custom &&
-                    r->section->kind != classify(_ctx.store().conversation(ch.conv)))
+                    r->section->kind != classify(ch.conv))
                     rebuildSoon(false);
                 else
                     resortSoon();
@@ -853,7 +853,7 @@ Sidebar::Sidebar(screens::Context &ctx, Avatars &avatars) : _ctx(ctx), _avatars(
                 (r ? r->unread != paintsUnread(cv) : cv.member && paintsUnread(cv));
             // Same classify() rebuild() uses, so a row only looks "moved" when it would be.
             const bool reclassified =
-                r && r->section->kind != Sidebar::Custom && r->section->kind != classify(cv);
+                r && r->section->kind != Sidebar::Custom && r->section->kind != classify(ch.conv);
             if (!r != !cv.member || reclassified || filterFlip)
                 rebuildSoon(false); // once per burst; the list stays where it was scrolled
             else {
@@ -951,8 +951,12 @@ bool Sidebar::isVip(const model::Conversation &c) const {
 }
 
 // VIP unreads first: Slack lifts them above every section, starred and app
-// DMs included (a VIP may be an app).
-Sidebar::Kind Sidebar::classify(const model::Conversation &c) const {
+// DMs included (a VIP may be an app). A conversation with an unsent draft
+// goes to Drafts: its own section, and the draft is never out of sight.
+Sidebar::Kind Sidebar::classify(model::ConvRef ref) const {
+    const auto &c = _ctx.store().conversation(ref);
+    if (_ctx.store().draft(ref, 0) != nullptr)
+        return Drafts;
     if (_ctx.backend.capabilities().vips && isVip(c))
         return Vip;
     if (c.starred)
@@ -1047,7 +1051,7 @@ void Sidebar::rebuild() {
     showNavSelection();
 
     // Bucketed by classify(); sorted per section by sortOf().
-    std::vector<ConvRef> lists[4], hiddenCh, hiddenExt, external, vipUnread;
+    std::vector<ConvRef> lists[4], hiddenCh, hiddenExt, external, vipUnread, drafts;
     const auto           listed = [&](ConvRef c) {
         return !_filters.unreadsOnly || c == _selected || paintsUnread(store.conversation(c));
     };
@@ -1092,7 +1096,10 @@ void Sidebar::rebuild() {
             continue;
         // classify() picks the bucket; each case keeps its own visibility
         // rule (unread-only filter, relevance window, ...).
-        switch (classify(cv)) {
+        switch (classify(c)) {
+        case Drafts:
+            drafts.push_back(c); // a draft is never hidden by the filters
+            break;
         case Starred:
             if (!_filters.unreadsOnly || !_filters.unreadsOnlyAppliesToStarred || listed(c))
                 lists[Starred].push_back(c);
@@ -1189,6 +1196,12 @@ void Sidebar::rebuild() {
     // Above everything, only while non-empty (see isVip).
     if (!vipUnread.empty()) {
         auto *h = section(Vip, Icon::Star, tr("VIP unreads"), vipUnread);
+        applyCollapse(h);
+    }
+    // Unsent drafts, right under VIP unreads: the conversations whose
+    // composer still holds something.
+    if (!drafts.empty()) {
+        auto *h = section(Drafts, Icon::Edit3, tr("Drafts"), drafts);
         applyCollapse(h);
     }
 
@@ -1512,6 +1525,8 @@ std::string Sidebar::sectionKey(Kind kind, const std::string &id) {
         return "#vip";
     case Team:
         return "#team";
+    case Drafts:
+        return "#drafts";
     case KindCount:
         break;
     }
