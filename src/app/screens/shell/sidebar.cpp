@@ -1675,9 +1675,15 @@ void Sidebar::rebuildSoon(bool reveal) {
         if (alive.expired())
             return;
         _rebuildTimer = 0;
+        ConvRow   *oldSelected  = rowFor(_selected);
+        const bool restoreFocus = oldSelected && window() && window()->focusView() == oldSelected;
         rebuild();
-        if (ConvRow *r = rowFor(_selected); r && std::exchange(_revealOnRebuild, false))
-            _scroll->ensureVisible(r, 8);
+        if (ConvRow *r = rowFor(_selected)) {
+            if (std::exchange(_revealOnRebuild, false))
+                _scroll->ensureVisible(r, 8);
+            if (restoreFocus)
+                r->focus();
+        }
         _revealOnRebuild = false;
     });
 }
