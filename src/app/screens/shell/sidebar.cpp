@@ -560,6 +560,9 @@ public:
                 you->style().margins(4, 0, 0, 0).noShrink();
             }
         }
+        draft = add<Label>(tr("Draft"), Font::Small, C::SidebarTextMuted);
+        draft->style().margins(6, 0, 0, 0).noShrink();
+        draft->setVisible(false);
         add<View>()->style().flex(1);
         // The badge and the huddle pill (in that order, last) are made the
         // first time they show: most rows never need either.
@@ -671,6 +674,10 @@ public:
             glyph->setTint(text);
         if (you)
             you->setColor(sel ? text : C::SidebarTextMuted);
+        if (draft) {
+            draft->setVisible(store.draft(conv, 0) != nullptr);
+            draft->setColor(sel ? text : C::SidebarTextMuted);
+        }
         refreshPresence();
         if (count > 0 || dot || badge)
             makeBadge()->set(count, count == 0 && dot);
@@ -698,6 +705,7 @@ public:
     Avatar        *avatar  = nullptr;
     IconView      *glyph   = nullptr;
     Label         *you     = nullptr;
+    Label         *draft   = nullptr;
     CountBadge    *badge   = nullptr;
     HuddlePill    *huddle  = nullptr;
     SectionHeader *section = nullptr;
