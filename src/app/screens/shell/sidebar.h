@@ -294,6 +294,7 @@ private:
     model::UserRef           _shapeMe              = model::kNoUser;
     int                      _rebuilds             = 0;
     bool                     _revealOnRebuild      = false;
+    bool                     _revealSelectedOnLayout = false; // scroll to it once rows have frames
     int                      _hiddenChannels       = 0;
     Collapsed                _collapsed; // sectionKey -> collapsed (only true stored)
     uint64_t _sectionsRev     = 0;       // Store::sectionsRevision at the last rebuild
