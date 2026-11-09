@@ -71,6 +71,8 @@ struct Settings {
     // Direct messages/Sessions and External connections above Starred,
     // custom sections and Channels; off, the existing order is unchanged.
     bool                     directAndExternalFirst = false;
+    bool                     unreadsOnlyAppliesToCustomSections = false,
+                             unreadsOnlyAppliesToStarred = false;
     bool                     animateEmoji = true, animateMedia = true;
     // The message toolbar's one-click reactions: 0 off, 1 the most used (the
     // emoji picker's Frequently used), 2 quickReactionNames.
